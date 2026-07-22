@@ -1,0 +1,15 @@
+# python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# saved photos shouldn't be committed to the repo
+backend/static/uploads/*
+!backend/static/uploads/.gitkeep
+backend/static/prints/*
+!backend/static/prints/.gitkeep
+
+# OS / editor junk
+.DS_Store
+.vscode/

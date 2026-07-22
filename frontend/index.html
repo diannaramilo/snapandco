@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>snap & co.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/landing.css" />
+</head>
+<body class="page-fade">
+
+  <main class="landing-card">
+    <h1>snap &amp; co.</h1>
+    <p class="tagline">capture the moment, one snap at a time</p>
+
+    <div class="preview-row">
+      <div class="strip-preview">
+        <span class="tilt t1"></span>
+        <span class="tilt t2"></span>
+        <span class="tilt t3"></span>
+        <span class="tilt t4"></span>
+      </div>
+      <div class="divider"></div>
+      <button id="enterBtn" class="btn btn-primary enter-btn">enter →</button>
+    </div>
+
+    <span class="watermark">made by @yourhandle</span>
+  </main>
+
+<script src="js/state.js"></script>
+<script src="js/transition.js"></script>
+<script>
+  // starting a fresh session wipes any leftovers from the last visitor
+  clearSession();
+  document.getElementById("enterBtn").addEventListener("click", () => {
+    goTo("choose-set.html");
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+/* ===== snap & co. — shared base styles =====
+   Every page (index, choose-set, camera, select-pictures,
+   choose-layout, result) loads this file first, then its
+   own page-specific stylesheet. */
+
+:root {
+  --cream: #fdf1de;
+  --cream-stripe: #f7e6c8;
+  --pink: #f3b8c8;
+  --pink-light: #fbe1e8;
+  --pink-dark: #e88fa6;
+  --brown: #3b2a24;
+  --white: #ffffff;
+  --gray-block: #d9d9d9;
+  --radius-lg: 24px;
+  --radius-md: 14px;
+  --radius-sm: 8px;
+  --shadow-card: 0 6px 0 rgba(59, 42, 36, 0.08);
+  --font-heading: "Poppins", "Segoe UI", sans-serif;
+  --font-body: "Quicksand", "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: var(--font-body);
+  color: var(--brown);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--cream) 0px,
+    var(--cream) 18px,
+    var(--cream-stripe) 18px,
+    var(--cream-stripe) 20px
+  );
+}
+
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  margin: 0;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn {
+  border-radius: 999px;
+  padding: 12px 28px;
+  font-weight: 700;
+  font-size: 15px;
+  background: var(--pink-light);
+  color: var(--brown);
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 rgba(59, 42, 36, 0.15);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.btn-primary {
+  background: var(--pink);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--brown);
+  padding: 10px 22px;
+}
+
+.top-back {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+}
+
+/* generic page fade/slide transition, toggled by js/transition.js */
+.page-fade {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.page-fade.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-fade-out {
+  opacity: 0 !important;
+  transform: translateY(-12px) !important;
+}
+
+.watermark {
+  position: absolute;
+  bottom: 18px;
+  left: 24px;
+  font-size: 12px;
+  opacity: 0.55;
+}

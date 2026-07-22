@@ -1,0 +1,250 @@
+[
+  {
+    "id": "a1",
+    "name": "Classic Pink",
+    "file": "a1.png",
+    "windows": [
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.07628,
+        "wFrac": 0.8625,
+        "hFrac": 0.17305
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.26882,
+        "wFrac": 0.8625,
+        "hFrac": 0.17538
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.46236,
+        "wFrac": 0.8625,
+        "hFrac": 0.17638
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.65723,
+        "wFrac": 0.8625,
+        "hFrac": 0.17938
+      }
+    ]
+  },
+  {
+    "id": "a2",
+    "name": "Classic Cream",
+    "file": "a2.png",
+    "windows": [
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.07628,
+        "wFrac": 0.8625,
+        "hFrac": 0.17305
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.26882,
+        "wFrac": 0.8625,
+        "hFrac": 0.17538
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.46236,
+        "wFrac": 0.8625,
+        "hFrac": 0.17638
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.65723,
+        "wFrac": 0.8625,
+        "hFrac": 0.17938
+      }
+    ]
+  },
+  {
+    "id": "b1",
+    "name": "Sweetheart Pink",
+    "file": "b1.png",
+    "windows": [
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.09233,
+        "wFrac": 0.78219,
+        "hFrac": 0.1665
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.27617,
+        "wFrac": 0.78219,
+        "hFrac": 0.16667
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.46067,
+        "wFrac": 0.78219,
+        "hFrac": 0.16683
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.645,
+        "wFrac": 0.78219,
+        "hFrac": 0.1665
+      }
+    ]
+  },
+  {
+    "id": "b2",
+    "name": "Sweetheart Cream",
+    "file": "b2.png",
+    "windows": [
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.09233,
+        "wFrac": 0.78219,
+        "hFrac": 0.1665
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.27617,
+        "wFrac": 0.78219,
+        "hFrac": 0.16667
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.46067,
+        "wFrac": 0.78219,
+        "hFrac": 0.16683
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.645,
+        "wFrac": 0.78219,
+        "hFrac": 0.1665
+      }
+    ]
+  },
+  {
+    "id": "c1",
+    "name": "Feb Fair Pink",
+    "file": "c1.png",
+    "windows": [
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.09233,
+        "wFrac": 0.78219,
+        "hFrac": 0.1665
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.27617,
+        "wFrac": 0.78219,
+        "hFrac": 0.16667
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.46067,
+        "wFrac": 0.78219,
+        "hFrac": 0.16683
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.645,
+        "wFrac": 0.78219,
+        "hFrac": 0.1665
+      }
+    ]
+  },
+  {
+    "id": "c2",
+    "name": "Feb Fair Cream",
+    "file": "c2.png",
+    "windows": [
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.09233,
+        "wFrac": 0.78219,
+        "hFrac": 0.1665
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.27617,
+        "wFrac": 0.78219,
+        "hFrac": 0.16667
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.46067,
+        "wFrac": 0.78219,
+        "hFrac": 0.16683
+      },
+      {
+        "xFrac": 0.10765,
+        "yFrac": 0.645,
+        "wFrac": 0.78219,
+        "hFrac": 0.1665
+      }
+    ]
+  },
+  {
+    "id": "d1",
+    "name": "Picnic Gingham Red",
+    "file": "d1.png",
+    "windows": [
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.07628,
+        "wFrac": 0.8625,
+        "hFrac": 0.17305
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.26882,
+        "wFrac": 0.8625,
+        "hFrac": 0.17538
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.46236,
+        "wFrac": 0.8625,
+        "hFrac": 0.17638
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.65723,
+        "wFrac": 0.8625,
+        "hFrac": 0.17938
+      }
+    ]
+  },
+  {
+    "id": "d2",
+    "name": "Picnic Gingham Pink",
+    "file": "d2.png",
+    "windows": [
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.07628,
+        "wFrac": 0.8625,
+        "hFrac": 0.17305
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.26882,
+        "wFrac": 0.8625,
+        "hFrac": 0.17538
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.46236,
+        "wFrac": 0.8625,
+        "hFrac": 0.17638
+      },
+      {
+        "xFrac": 0.066,
+        "yFrac": 0.65723,
+        "wFrac": 0.8625,
+        "hFrac": 0.17938
+      }
+    ]
+  }
+]

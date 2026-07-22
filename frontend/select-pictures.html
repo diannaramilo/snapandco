@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Choose your pictures — snap & co.</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/select-pictures.css" />
+</head>
+<body class="page-fade">
+
+  <header class="sp-header">
+    <h1>Choose your pictures</h1>
+    <p class="subtitle">select four pictures for the final strip</p>
+  </header>
+
+  <div class="sp-wrap">
+    <div class="slots" id="slots">
+      <div class="slot" data-index="0"></div>
+      <div class="slot" data-index="1"></div>
+      <div class="slot" data-index="2"></div>
+      <div class="slot" data-index="3"></div>
+    </div>
+
+    <div class="pool" id="pool"></div>
+  </div>
+
+  <button id="nextBtn" class="btn btn-primary sp-next" disabled>next →</button>
+
+<script src="js/state.js"></script>
+<script src="js/transition.js"></script>
+<script src="js/select-pictures.js"></script>
+</body>
+</html>

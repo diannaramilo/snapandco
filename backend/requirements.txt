@@ -1,0 +1,5 @@
+Flask==3.0.3
+flask-cors==4.0.1
+Pillow==10.4.0
+# Windows only, needed if you wire up win32print in app.py:
+# pywin32==306

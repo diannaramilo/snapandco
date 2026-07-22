@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Choose your set — snap & co.</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/choose-set.css" />
+</head>
+<body class="page-fade">
+
+  <button class="btn btn-outline top-back" id="backBtn">← back</button>
+
+  <main class="set-page">
+    <h1>Choose your set</h1>
+    <p class="subtitle">pick your favorite set</p>
+
+    <div class="set-options">
+      <button class="set-card" data-set="1">
+        <div class="strip strip-a">
+          <span class="strip-label">snap &amp; co.</span>
+          <i></i><i></i><i></i><i></i>
+          <span class="strip-brand">snap</span>
+        </div>
+        <div class="strip strip-b">
+          <span class="strip-label">snap &amp; co.</span>
+          <i></i><i></i><i></i><i></i>
+          <span class="strip-brand">snap</span>
+        </div>
+      </button>
+
+      <button class="set-card" data-set="2">
+        <div class="strip strip-tall">
+          <span class="strip-label">snap &amp; co.</span>
+          <i></i><i></i><i></i><i></i>
+          <span class="strip-brand">snap</span>
+        </div>
+        <div class="strip-mini-grid">
+          <div class="strip mini"><i></i><i></i><i></i><i></i></div>
+          <div class="strip mini"><i></i><i></i><i></i><i></i></div>
+          <div class="strip mini"><i></i><i></i><i></i><i></i></div>
+          <div class="strip mini"><i></i><i></i><i></i><i></i></div>
+        </div>
+      </button>
+    </div>
+
+    <div class="set-labels">
+      <span>set 1</span>
+      <span>set 2</span>
+    </div>
+
+    <button id="nextBtn" class="btn btn-primary next-btn" disabled>next →</button>
+  </main>
+
+<script src="js/state.js"></script>
+<script src="js/transition.js"></script>
+<script src="js/choose-set.js"></script>
+</body>
+</html>

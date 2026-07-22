@@ -1,0 +1,74 @@
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-card {
+  position: relative;
+  width: 500px;
+  max-width: 92vw;
+  background: var(--white);
+  border: 4px solid var(--brown);
+  border-radius: var(--radius-lg);
+  padding: 48px 40px 60px;
+  text-align: center;
+}
+
+.landing-card h1 {
+  font-size: 40px;
+}
+
+.tagline {
+  margin-top: 6px;
+  font-weight: 600;
+  color: #6b5850;
+}
+
+.preview-row {
+  margin-top: 34px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.strip-preview {
+  flex: 1;
+  height: 120px;
+  background: var(--cream);
+  border: 2px solid var(--brown);
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.tilt {
+  position: absolute;
+  top: 20px;
+  width: 44px;
+  height: 80px;
+  background: var(--white);
+  border: 2px solid var(--brown);
+  border-radius: 4px;
+}
+.t1 { left: 20px;  transform: rotate(-8deg); }
+.t2 { left: 90px;  transform: rotate(6deg); top: 26px; }
+.t3 { left: 160px; transform: rotate(-4deg); }
+.t4 { left: 230px; transform: rotate(9deg); top: 24px; }
+
+.divider {
+  width: 2px;
+  height: 100px;
+  background: var(--brown);
+  opacity: 0.5;
+}
+
+.enter-btn {
+  flex: 1;
+  height: 120px;
+  border-radius: var(--radius-md);
+  font-size: 18px;
+  background: repeating-linear-gradient(
+    90deg, var(--pink) 0 14px, var(--pink-light) 14px 28px
+  );
+}

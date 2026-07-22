@@ -1,0 +1,88 @@
+body {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding-top: 40px;
+}
+
+.cam-header { text-align: center; }
+.cam-header h1 { font-size: 30px; }
+.subtitle { margin-top: 6px; color: #6b5850; font-weight: 600; }
+
+.cam-wrap {
+  position: relative;
+  margin-top: 24px;
+  width: min(880px, 92vw);
+  aspect-ratio: 16 / 9;
+  background: var(--gray-block);
+  border: 2px solid var(--brown);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+#preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* mirror like a normal booth screen */
+}
+
+.countdown-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 120px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.countdown-overlay.show { opacity: 1; }
+
+.shot-overlay {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+.shot-overlay.flash {
+  animation: flash 0.35s ease;
+}
+@keyframes flash {
+  0% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+.shot-counter {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.cam-controls {
+  margin-top: 26px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+#cameraSelect {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--brown);
+  font-family: var(--font-body);
+  font-weight: 600;
+}

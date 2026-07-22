@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your strip — snap & co.</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/result.css" />
+<!-- client-side QR generator, runs entirely in the visitor's browser -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body class="page-fade">
+
+  <h1>Scan the QR to save pictures</h1>
+
+  <div class="result-row">
+    <div class="qr-box">
+      <canvas id="qrLeft"></canvas>
+      <span class="qr-label">QR</span>
+    </div>
+
+    <canvas id="finalCanvas" class="final-strip"></canvas>
+
+    <div class="qr-box">
+      <canvas id="qrRight"></canvas>
+      <span class="qr-label">QR</span>
+    </div>
+  </div>
+
+  <div class="result-controls">
+    <div class="left-actions">
+      <button id="downloadBtn" class="btn btn-outline">⬇ download</button>
+      <button id="printBtn" class="btn btn-outline">🖨 print</button>
+      <button id="restartBtn" class="btn btn-outline">↻ restart</button>
+    </div>
+
+    <div class="copy-stepper">
+      <span>additional copy</span>
+      <div class="stepper">
+        <button id="copyMinus">−</button>
+        <span id="copyCount">0</span>
+        <button id="copyPlus">+</button>
+      </div>
+    </div>
+  </div>
+
+  <p id="statusMsg" class="status-msg"></p>
+
+<script src="js/state.js"></script>
+<script src="js/transition.js"></script>
+<script src="js/strip-render.js"></script>
+<script src="js/result.js"></script>
+</body>
+</html>
