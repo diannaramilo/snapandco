@@ -4,51 +4,52 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Your strip — snap & co.</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/modal.css" />
 <link rel="stylesheet" href="css/result.css" />
-<!-- client-side QR generator, runs entirely in the visitor's browser -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
-<body class="page-fade">
+<body>
+  <div class="preview-container">
+    <div class="title">Scan the QR to save pictures</div>
 
-  <h1>Scan the QR to save pictures</h1>
-
-  <div class="result-row">
-    <div class="qr-box">
-      <canvas id="qrLeft"></canvas>
-      <span class="qr-label">QR</span>
+    <div class="main-frame">
+      <canvas id="finalCanvas"></canvas>
     </div>
 
-    <canvas id="finalCanvas" class="final-strip"></canvas>
+    <div class="qr-container left"><canvas id="qrLeft"></canvas></div>
+    <div class="qr-container right"><canvas id="qrRight"></canvas></div>
 
-    <div class="qr-box">
-      <canvas id="qrRight"></canvas>
-      <span class="qr-label">QR</span>
+    <div class="bottom-actions">
+      <button id="downloadBtn" class="action-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        download
+      </button>
+      <button id="printBtn" class="action-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9V3h12v6M6 18H4a1 1 0 01-1-1v-5a1 1 0 011-1h16a1 1 0 011 1v5a1 1 0 01-1 1h-2M6 14h12v7H6v-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        print
+      </button>
+      <button id="restartBtn" class="action-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        restart
+      </button>
     </div>
-  </div>
 
-  <div class="result-controls">
-    <div class="left-actions">
-      <button id="downloadBtn" class="btn btn-outline">⬇ download</button>
-      <button id="printBtn" class="btn btn-outline">🖨 print</button>
-      <button id="restartBtn" class="btn btn-outline">↻ restart</button>
-    </div>
-
-    <div class="copy-stepper">
-      <span>additional copy</span>
-      <div class="stepper">
-        <button id="copyMinus">−</button>
-        <span id="copyCount">0</span>
-        <button id="copyPlus">+</button>
+    <div class="copy-control">
+      <div class="copy-label">additional copy</div>
+      <div class="copy-row">
+        <button id="copyMinus" aria-label="Fewer copies">−</button>
+        <div class="copy-counter" id="copyCount">0</div>
+        <button id="copyPlus" aria-label="More copies">+</button>
       </div>
     </div>
+
+    <p id="statusMsg" class="status-msg"></p>
   </div>
 
-  <p id="statusMsg" class="status-msg"></p>
-
 <script src="js/state.js"></script>
-<script src="js/transition.js"></script>
+<script src="js/modal.js"></script>
 <script src="js/strip-render.js"></script>
 <script src="js/result.js"></script>
 </body>

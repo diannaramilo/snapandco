@@ -4,33 +4,44 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Choose your frame — snap & co.</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/modal.css" />
 <link rel="stylesheet" href="css/choose-layout.css" />
 </head>
-<body class="page-fade">
+<body>
+  <button class="pill-btn fixed-back" id="backBtn">←retake</button>
 
-  <button class="btn btn-outline top-back" id="backBtn">← retake</button>
-
-  <main class="layout-page">
+  <div class="page-header">
     <h1>Choose your frame</h1>
-    <p class="subtitle">select a style for your photos</p>
+    <p>select a style for your photos</p>
+  </div>
 
-    <div class="layout-split">
-      <div class="photos-column" id="photosColumn"></div>
+  <button class="pill-btn fixed-next" id="nextBtn">next →</button>
 
-      <div class="frame-gallery">
-        <button class="arrow" id="scrollLeft" aria-label="scroll left">‹</button>
-        <div class="frame-row" id="frameRow"></div>
-        <button class="arrow" id="scrollRight" aria-label="scroll right">›</button>
+  <div class="picker-area">
+    <div class="live-preview-wrap">
+      <div class="live-preview" id="livePreview">
+        <div id="preview-shots"></div>
+        <img id="preview-frame-overlay" src="" alt="Frame preview">
       </div>
     </div>
 
-    <button id="nextBtn" class="btn btn-primary layout-next" disabled>next →</button>
-  </main>
+    <div class="frame-carousel">
+      <button class="arrow-btn" id="prevFrame" aria-label="Previous frames">
+        <svg width="14" height="24" viewBox="0 0 14 24" fill="none"><path d="M12 2L2 12L12 22" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <div class="frame-page" id="framePage"></div>
+
+      <button class="arrow-btn" id="nextFrameBtn" aria-label="Next frames">
+        <svg width="14" height="24" viewBox="0 0 14 24" fill="none"><path d="M2 2L12 12L2 22" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
 
 <script src="js/state.js"></script>
-<script src="js/transition.js"></script>
+<script src="js/modal.js"></script>
 <script src="js/strip-render.js"></script>
 <script src="js/choose-layout.js"></script>
 </body>

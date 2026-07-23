@@ -1,17 +1,16 @@
 /*
  * result.js
  * ----------
- * 1. Redraws the chosen frame + photos at full print resolution.
- * 2. Uploads that image to the Flask backend, which stores it and
- *    hands back a short download URL — that URL is what the QR
- *    codes point to (so people scan with their phone, no laptop
- *    needed, and the QR doesn't have to encode a giant image).
+ * 1. Redraws the chosen frame + photos at full print resolution
+ *    onto #finalCanvas (styled to the same 208x623 box as the old
+ *    preview page, but the actual bitmap is 600x1800 = 2x6" @300dpi).
+ * 2. Uploads that image to the Flask backend, which hands back a
+ *    short download URL — that's what the QR codes point to.
  * 3. Wires up download / print / restart / extra-copies.
  *
  * BACKEND_URL: change this to wherever backend/app.py is actually
- * running (see backend/README section in the project README).
- * If the backend isn't reachable, download still works locally —
- * only the QR / server-side print automation needs it.
+ * running (see README). If the backend isn't reachable, download
+ * still works locally — only the QR / server-side print need it.
  */
 
 const BACKEND_URL = window.SNAPANDCO_BACKEND_URL || "http://localhost:5000";
@@ -21,7 +20,6 @@ const finalCanvas = document.getElementById("finalCanvas");
 const statusMsg = document.getElementById("statusMsg");
 
 let extraCopies = 0;
-let uploadedUrl = null;
 
 async function buildFinalImage() {
   const [photoImgs] = await Promise.all([
@@ -29,7 +27,6 @@ async function buildFinalImage() {
     loadFrameCatalog(),
   ]);
   const frame = getFrameById(session.frameId);
-  // real print resolution: 2in x 6in @ 300dpi
   finalCanvas.width = 600;
   finalCanvas.height = 1800;
   drawStrip(finalCanvas, frame, photoImgs);
@@ -41,15 +38,12 @@ async function uploadToBackend(dataUrl) {
     const res = await fetch(`${BACKEND_URL}/api/save`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        image: dataUrl,
-        set: session.set,
-      }),
+      body: JSON.stringify({ image: dataUrl, set: session.set }),
     });
     if (!res.ok) throw new Error("upload failed");
     const data = await res.json();
     saveSession({ sessionId: data.id });
-    return data.download_url; // e.g. http://<kiosk-ip>:5000/photo/<id>
+    return data.download_url;
   } catch (err) {
     console.warn("Backend not reachable, QR/print will be limited:", err);
     statusMsg.textContent =
@@ -67,7 +61,7 @@ async function init() {
   const dataUrl = await buildFinalImage();
   saveSession({ resultImage: dataUrl });
 
-  uploadedUrl = await uploadToBackend(dataUrl);
+  const uploadedUrl = await uploadToBackend(dataUrl);
   const qrTarget = uploadedUrl || `${BACKEND_URL}/photo/pending`;
 
   renderQr(document.getElementById("qrLeft"), qrTarget);
@@ -98,15 +92,22 @@ document.getElementById("printBtn").addEventListener("click", async () => {
     statusMsg.textContent = "Sent to printer ✓";
   } catch (err) {
     console.error(err);
-    statusMsg.textContent =
-      "Couldn't reach the print server. Falling back to your browser's print dialog.";
+    statusMsg.textContent = "Couldn't reach the print server. Falling back to your browser's print dialog.";
     window.print();
   }
 });
 
-document.getElementById("restartBtn").addEventListener("click", () => {
-  clearSession();
-  goTo("index.html");
+document.getElementById("restartBtn").addEventListener("click", async () => {
+  const confirmed = await confirmModal({
+    title: "Start a new session?",
+    message: "This session's photos will no longer be accessible after you restart.",
+    confirmText: "Restart",
+    cancelText: "Cancel",
+  });
+  if (confirmed) {
+    clearSession();
+    window.location.href = "index.html";
+  }
 });
 
 document.getElementById("copyMinus").addEventListener("click", () => {

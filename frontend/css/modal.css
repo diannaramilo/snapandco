@@ -1,0 +1,62 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(68, 47, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+}
+.modal-overlay.open { opacity: 1; visibility: visible; }
+
+.modal-box {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  width: 320px;
+  max-width: 90vw;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(68, 47, 42, 0.3);
+  transform: translateY(12px) scale(0.97);
+  transition: transform 0.25s ease;
+}
+.modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+
+.modal-box h3 {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: #442f2a;
+  margin-bottom: 10px;
+}
+
+.modal-box p {
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  color: #442f2a;
+  opacity: 0.85;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.modal-actions { display: flex; gap: 12px; justify-content: center; }
+
+.modal-btn {
+  flex: 1;
+  height: 44px;
+  border-radius: 22px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid #442f2a;
+  background: white;
+  color: #442f2a;
+  transition: all 0.2s ease;
+}
+.modal-btn:hover { background: #f2ede8; }
+.modal-btn.primary { background: #442f2a; color: white; }
+.modal-btn.primary:hover { background: #ff69b4; border-color: #ff69b4; }
