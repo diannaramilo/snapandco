@@ -6,21 +6,21 @@ body {
 }
 
 .picker-area {
-  gap: 90px;
+  gap: 70px;
   align-items: center;
 }
 
-/* ---------------- live preview ---------------- */
+/* ---------------- live preview (bigger — this is "the one with the picture taken") ---------------- */
 .live-preview-wrap { display: flex; justify-content: center; }
 
 .live-preview {
   position: relative;
-  width: 137px;
-  height: 411px;
-  border-radius: 4px;
+  width: 220px;
+  height: 660px;
+  border-radius: 6px;
   overflow: hidden;
   background: var(--gray-block);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
   transition: box-shadow 0.3s ease;
 }
 
@@ -47,12 +47,12 @@ body {
 }
 #preview-frame-overlay.loaded { opacity: 1; }
 
-/* ---------------- frame carousel ---------------- */
-.frame-carousel { display: flex; align-items: center; gap: 24px; }
+/* ---------------- frame carousel — bigger cards, slideable ---------------- */
+.frame-carousel { display: flex; align-items: center; gap: 20px; }
 
 .arrow-btn {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: none;
   background: transparent;
@@ -66,28 +66,52 @@ body {
 }
 .arrow-btn:hover { transform: scale(1.15); color: var(--pink-accent); }
 
-.frame-page { display: flex; gap: 18px; touch-action: pan-y; }
+/* the visible "window" onto the slideable strip of frames */
+.frame-page-viewport {
+  width: 460px;
+  max-width: 60vw;
+  overflow: hidden;
+}
+
+/* the actual slideable strip — drag or swipe to slide through it,
+   arrows scroll it by one card, scroll-snap keeps cards aligned */
+.frame-page {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  cursor: grab;
+  padding: 4px 0 16px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.frame-page::-webkit-scrollbar { display: none; }
+.frame-page.dragging { cursor: grabbing; scroll-behavior: auto; scroll-snap-type: none; }
 
 .frame-card {
-  width: 90px;
-  height: 270px;
-  border-radius: 6px;
+  width: 140px;
+  height: 420px;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   border: 3px solid transparent;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, opacity 0.3s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   opacity: 0;
   transform: translateY(8px);
   background: #fafafa;
 }
 .frame-card.entered { opacity: 1; transform: translateY(0); }
-.frame-card img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.frame-card img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
 .frame-card:hover { transform: translateY(-4px); }
-.frame-card.selected { border-color: var(--pink-accent); box-shadow: 0 8px 22px rgba(255, 105, 180, 0.35); }
+.frame-card.selected { border-color: var(--pink-accent); box-shadow: 0 10px 26px rgba(255, 105, 180, 0.38); }
 
-@media (max-width: 760px) {
-  .picker-area { gap: 40px; }
-  .frame-card { width: 74px; height: 222px; }
-  .live-preview { width: 118px; height: 354px; }
+@media (max-width: 900px) {
+  .picker-area { gap: 36px; }
+  .live-preview { width: 170px; height: 510px; }
+  .frame-page-viewport { width: 320px; }
+  .frame-card { width: 105px; height: 315px; }
 }
