@@ -4,17 +4,15 @@
  * Left side: one big "live preview" — the guest's actual 4 photos
  * layered under whichever frame is currently selected, so picking a
  * frame instantly shows what their strip will look like.
- * Right side: a paged carousel of plain frame thumbnails (just the
- * frame art, no photos baked in) — 4 per page, arrows or swipe to
- * see more.
+ * Right side: all frames laid out in one slideable strip (drag with
+ * a mouse, swipe with a finger, or use the arrow buttons) — plain
+ * frame art only, no photos baked into the thumbnails.
  *
  * If no retake happened, the 4 photos from round1 ARE the final
  * photos (no need to make them pick, since there's exactly 4).
  * If a retake happened, finalPhotos was already set by
  * select-pictures.js.
  */
-
-const PAGE_SIZE = 4;
 
 const session = requireSessionField("set", "choose-set.html");
 const finalPhotos = session.finalPhotos || session.round1Photos;
@@ -27,7 +25,6 @@ const previewShotsEl = document.getElementById("preview-shots");
 const previewFrameEl = document.getElementById("preview-frame-overlay");
 
 let frames = [];
-let currentPage = 0;
 let selectedFrameIndex = -1;
 
 function setupBackButton() {
@@ -53,27 +50,21 @@ async function handleRetake() {
   window.location.href = "camera.html?retake=1";
 }
 
-function renderFramePage() {
+function renderFrameStrip() {
   framePage.innerHTML = "";
-  const start = currentPage * PAGE_SIZE;
-  const pageFrames = frames.slice(start, start + PAGE_SIZE);
-
-  pageFrames.forEach((frame, i) => {
-    const globalIndex = start + i;
+  frames.forEach((frame, index) => {
     const card = document.createElement("div");
-    card.className = "frame-card" + (globalIndex === selectedFrameIndex ? " selected" : "");
-    card.dataset.index = globalIndex;
+    card.className = "frame-card" + (index === selectedFrameIndex ? " selected" : "");
+    card.dataset.index = index;
 
     const img = document.createElement("img");
     img.src = `assets/frames/${frame.file}`;
+    img.draggable = false;
     card.appendChild(img);
 
-    card.addEventListener("click", () => selectFrame(globalIndex));
     framePage.appendChild(card);
 
-    requestAnimationFrame(() => {
-      setTimeout(() => card.classList.add("entered"), i * 40);
-    });
+    setTimeout(() => card.classList.add("entered"), index * 35);
   });
 }
 
@@ -86,23 +77,68 @@ function selectFrame(index) {
   nextBtn.classList.add("visible");
 }
 
-function changePage(delta) {
-  const totalPages = Math.ceil(frames.length / PAGE_SIZE);
-  currentPage = (currentPage + delta + totalPages) % totalPages;
-  renderFramePage();
+function scrollToCard(index) {
+  const card = framePage.children[index];
+  if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
 }
 
-document.getElementById("prevFrame").addEventListener("click", () => changePage(-1));
-document.getElementById("nextFrameBtn").addEventListener("click", () => changePage(1));
+/* --- arrow buttons: step one card at a time --- */
+function cardStep() {
+  const first = framePage.querySelector(".frame-card");
+  if (!first) return 0;
+  const style = getComputedStyle(framePage);
+  return first.getBoundingClientRect().width + parseFloat(style.gap || 20);
+}
 
-let touchStartX = null;
-framePage.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
-framePage.addEventListener("touchend", (e) => {
-  if (touchStartX === null) return;
-  const delta = e.changedTouches[0].clientX - touchStartX;
-  if (Math.abs(delta) > 40) changePage(delta > 0 ? -1 : 1);
-  touchStartX = null;
+document.getElementById("prevFrame").addEventListener("click", () => {
+  framePage.scrollBy({ left: -cardStep(), behavior: "smooth" });
 });
+document.getElementById("nextFrameBtn").addEventListener("click", () => {
+  framePage.scrollBy({ left: cardStep(), behavior: "smooth" });
+});
+
+/* --- slideable strip: drag with mouse OR touch via pointer events ---
+   One pointer flow handles both dragging AND tapping to select, so
+   there's no race between a separate "click" listener and the drag
+   logic: on release, if the pointer barely moved it's a tap (select
+   whichever card is under it), otherwise it was a drag (just leave
+   the scroll position where it landed). */
+const DRAG_THRESHOLD = 6;
+let isDown = false;
+let startX = 0;
+let startScroll = 0;
+let moved = 0;
+let downCard = null;
+
+framePage.addEventListener("pointerdown", (e) => {
+  isDown = true;
+  moved = 0;
+  framePage.classList.add("dragging");
+  startX = e.clientX;
+  startScroll = framePage.scrollLeft;
+  downCard = e.target.closest(".frame-card");
+  framePage.setPointerCapture(e.pointerId);
+});
+
+framePage.addEventListener("pointermove", (e) => {
+  if (!isDown) return;
+  const delta = e.clientX - startX;
+  moved = Math.max(moved, Math.abs(delta));
+  framePage.scrollLeft = startScroll - delta;
+});
+
+function endDrag() {
+  if (!isDown) return;
+  isDown = false;
+  framePage.classList.remove("dragging");
+  if (moved < DRAG_THRESHOLD && downCard) {
+    selectFrame(Number(downCard.dataset.index));
+  }
+  downCard = null;
+}
+framePage.addEventListener("pointerup", endDrag);
+framePage.addEventListener("pointercancel", endDrag);
+framePage.addEventListener("pointerleave", () => { if (isDown) endDrag(); });
 
 function updateLivePreview() {
   const frame = selectedFrameIndex > -1 ? frames[selectedFrameIndex] : frames[0];
@@ -135,17 +171,30 @@ nextBtn.addEventListener("click", () => {
 });
 
 async function init() {
-  frames = await loadFrameCatalog();
+  try {
+    frames = await loadFrameCatalog();
+  } catch (err) {
+    console.error("Couldn't load frame catalog:", err);
+    framePage.innerHTML =
+      '<p style="padding:20px;font-size:14px;color:#a05a6e;max-width:340px;">' +
+      "Couldn't load the frames. This page needs to be served over http (e.g. " +
+      "<code>python -m http.server</code> from the frontend folder) — opening " +
+      "the file directly in the browser (file://) blocks it from loading " +
+      "assets/frames/frames.json.</p>";
+    return;
+  }
 
   if (session.frameId) {
     selectedFrameIndex = frames.findIndex((f) => f.id === session.frameId);
-    currentPage = Math.floor(Math.max(0, selectedFrameIndex) / PAGE_SIZE);
   }
 
   setupBackButton();
-  renderFramePage();
+  renderFrameStrip();
   updateLivePreview();
   nextBtn.classList.toggle("visible", selectedFrameIndex > -1);
+  if (selectedFrameIndex > -1) {
+    setTimeout(() => scrollToCard(selectedFrameIndex), 50);
+  }
 }
 
 init();
