@@ -2,58 +2,90 @@
  * select-pictures.js
  * --------------------
  * Only reached when a retake happened: pool = round1Photos (4)
- * + round2Photos (4) = 8 candidates. Visitor taps up to 4 to
- * fill the slots on the left, in the order tapped.
+ * + round2Photos (4) = 8 candidates. Visitor taps up to 4, in
+ * order, to fill the numbered slots on the left.
  */
 
 const session = requireSessionField("round2Photos", "index.html");
-const pool = [...(session.round1Photos || []), ...(session.round2Photos || [])];
+const pool = [...(session.round1Photos || []), ...(session.round2Photos || [])].map(
+  (url, i) => ({ key: `p${i}`, url })
+);
 
-const poolEl = document.getElementById("pool");
-const slotsEl = document.getElementById("slots");
+const photoGrid = document.getElementById("photoGrid");
+const slots = [...document.querySelectorAll(".slot")];
 const nextBtn = document.getElementById("nextBtn");
 
-let picked = []; // dataURLs in chosen order
+let selectedKeys = [];
 
-pool.forEach((dataUrl, i) => {
-  const item = document.createElement("div");
-  item.className = "pool-item";
-  item.style.backgroundImage = `url(${dataUrl})`;
-  item.dataset.index = i;
-  item.addEventListener("click", () => togglePick(dataUrl, item));
-  poolEl.appendChild(item);
-});
+function renderGrid() {
+  photoGrid.innerHTML = "";
+  pool.forEach((photo) => {
+    const thumb = document.createElement("div");
+    thumb.className = "photo-thumb";
+    thumb.dataset.key = photo.key;
 
-function togglePick(dataUrl, el) {
-  const existingIndex = picked.indexOf(dataUrl);
-  if (existingIndex !== -1) {
-    picked.splice(existingIndex, 1);
-    el.classList.remove("picked");
-  } else {
-    if (picked.length >= 4) return;
-    picked.push(dataUrl);
-    el.classList.add("picked");
-  }
-  renderSlots();
+    const img = document.createElement("img");
+    img.src = photo.url;
+    thumb.appendChild(img);
+
+    thumb.addEventListener("click", () => togglePhoto(photo.key, thumb));
+    photoGrid.appendChild(thumb);
+  });
 }
 
-function renderSlots() {
-  const slots = slotsEl.querySelectorAll(".slot");
-  slots.forEach((slot, i) => {
-    slot.style.backgroundImage = picked[i] ? `url(${picked[i]})` : "";
-  });
-  nextBtn.disabled = picked.length !== 4;
+function togglePhoto(key, el) {
+  const idx = selectedKeys.indexOf(key);
+  if (idx > -1) {
+    selectedKeys.splice(idx, 1);
+    el.classList.remove("selected");
+    const badge = el.querySelector(".badge");
+    if (badge) badge.remove();
+  } else {
+    if (selectedKeys.length >= 4) return;
+    selectedKeys.push(key);
+    el.classList.add("selected");
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = String(selectedKeys.length);
+    el.appendChild(badge);
+  }
+  renumberBadges();
+  updateSlots();
+  nextBtn.classList.toggle("visible", selectedKeys.length === 4);
+}
 
-  // once all 4 pool items are used up as much as possible, dim the rest
-  const poolItems = poolEl.querySelectorAll(".pool-item");
-  poolItems.forEach((item) => {
-    const url = pool[Number(item.dataset.index)];
-    const isPicked = picked.includes(url);
-    item.classList.toggle("disabled", picked.length >= 4 && !isPicked);
+function renumberBadges() {
+  selectedKeys.forEach((key, i) => {
+    const badge = photoGrid.querySelector(`.photo-thumb[data-key="${key}"] .badge`);
+    if (badge) badge.textContent = String(i + 1);
+  });
+}
+
+function updateSlots() {
+  slots.forEach((slot, i) => {
+    slot.innerHTML = `<span class="slot-num">${i + 1}</span>`;
+    slot.classList.remove("filled");
+    const key = selectedKeys[i];
+    if (key) {
+      const photo = pool.find((p) => p.key === key);
+      if (photo) {
+        slot.classList.add("filled");
+        const img = document.createElement("img");
+        img.src = photo.url;
+        img.onload = () => img.classList.add("loaded");
+        slot.appendChild(img);
+        slot.querySelector(".slot-num").textContent = String(i + 1);
+      }
+    }
   });
 }
 
 nextBtn.addEventListener("click", () => {
-  saveSession({ finalPhotos: picked });
-  goTo("choose-layout.html");
+  if (selectedKeys.length !== 4 || nextBtn.classList.contains("loading")) return;
+  nextBtn.classList.add("loading");
+  const finalPhotos = selectedKeys.map((key) => pool.find((p) => p.key === key).url);
+  saveSession({ finalPhotos });
+  window.location.href = "choose-layout.html";
 });
+
+renderGrid();

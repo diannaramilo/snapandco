@@ -5,37 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>snap & co.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/landing.css" />
 </head>
-<body class="page-fade">
-
-  <main class="landing-card">
-    <h1>snap &amp; co.</h1>
-    <p class="tagline">capture the moment, one snap at a time</p>
-
-    <div class="preview-row">
-      <div class="strip-preview">
-        <span class="tilt t1"></span>
-        <span class="tilt t2"></span>
-        <span class="tilt t3"></span>
-        <span class="tilt t4"></span>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <h1>snap &amp; co.</h1>
+        <p>capture the moment, one snap at a time</p>
       </div>
-      <div class="divider"></div>
-      <button id="enterBtn" class="btn btn-primary enter-btn">enter →</button>
-    </div>
 
-    <span class="watermark">made by @yourhandle</span>
-  </main>
+      <div class="content-wrapper">
+        <div class="left-section">
+          <div class="photo-rect">
+            <div class="photostrip"><span class="line"></span><span class="line"></span><span class="line"></span></div>
+            <div class="photostrip"><span class="line"></span><span class="line"></span><span class="line"></span></div>
+            <div class="photostrip"><span class="line"></span><span class="line"></span><span class="line"></span></div>
+            <div class="photostrip"><span class="line"></span><span class="line"></span><span class="line"></span></div>
+          </div>
+        </div>
+
+        <div class="middle-divider"></div>
+
+        <div class="right-section">
+          <div class="stripes"></div>
+          <button id="enterBtn" class="enter-btn">enter →</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script src="js/state.js"></script>
-<script src="js/transition.js"></script>
 <script>
-  // starting a fresh session wipes any leftovers from the last visitor
   clearSession();
   document.getElementById("enterBtn").addEventListener("click", () => {
-    goTo("choose-set.html");
+    window.location.href = "choose-set.html";
   });
 </script>
 </body>

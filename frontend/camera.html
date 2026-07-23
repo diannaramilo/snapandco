@@ -4,33 +4,28 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Snap your pictures — snap & co.</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/camera.css" />
 </head>
-<body class="page-fade" style="background:#fff;">
+<body>
+  <div class="timer-container">
+    <select id="cameraSelect" class="camera-select" title="Choose camera source"></select>
 
-  <header class="cam-header">
-    <h1>Snap your pictures</h1>
-    <p class="subtitle">Do your best shots, there's no retake</p>
-  </header>
+    <div class="main-title" id="mainTitle">Snap your pictures</div>
+    <div class="subtitle" id="subtitle">Do your best shots, there's no retake</div>
 
-  <div class="cam-wrap">
-    <video id="preview" autoplay playsinline muted></video>
-    <canvas id="captureCanvas" hidden></canvas>
+    <div id="frame" class="frame">
+      <video id="live-video" autoplay muted playsinline></video>
+      <img id="freeze-frame" alt="">
+      <div id="countdown">10</div>
+      <button id="startBtn" class="pill-btn start-btn">start capturing →</button>
+    </div>
 
-    <div id="countdownOverlay" class="countdown-overlay">3</div>
-    <div id="shotOverlay" class="shot-overlay"></div>
-    <div id="shotCounter" class="shot-counter">shot 0 / 4</div>
-  </div>
-
-  <div class="cam-controls">
-    <select id="cameraSelect" title="Choose camera source"></select>
-    <button id="startBtn" class="btn btn-primary">start capturing →</button>
+    <div id="shots-counter">Get Ready!</div>
   </div>
 
 <script src="js/state.js"></script>
-<script src="js/transition.js"></script>
 <script src="js/camera.js"></script>
 </body>
 </html>

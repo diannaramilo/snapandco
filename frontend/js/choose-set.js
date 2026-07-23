@@ -16,16 +16,17 @@ cards.forEach((card) => {
     cards.forEach((c) => c.classList.remove("selected"));
     card.classList.add("selected");
     chosenSet = Number(card.dataset.set);
-    nextBtn.disabled = false;
+    nextBtn.classList.add("visible");
   });
 });
 
 nextBtn.addEventListener("click", () => {
-  if (!chosenSet) return;
+  if (!chosenSet || nextBtn.classList.contains("loading")) return;
+  nextBtn.classList.add("loading");
   saveSession({ set: chosenSet });
-  goTo("camera.html");
+  window.location.href = "camera.html";
 });
 
 document.getElementById("backBtn").addEventListener("click", () => {
-  goTo("index.html");
+  window.location.href = "index.html";
 });

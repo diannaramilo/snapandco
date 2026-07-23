@@ -4,32 +4,30 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Choose your pictures — snap & co.</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/select-pictures.css" />
 </head>
-<body class="page-fade">
-
-  <header class="sp-header">
+<body>
+  <div class="page-header">
     <h1>Choose your pictures</h1>
-    <p class="subtitle">select four pictures for the final strip</p>
-  </header>
-
-  <div class="sp-wrap">
-    <div class="slots" id="slots">
-      <div class="slot" data-index="0"></div>
-      <div class="slot" data-index="1"></div>
-      <div class="slot" data-index="2"></div>
-      <div class="slot" data-index="3"></div>
-    </div>
-
-    <div class="pool" id="pool"></div>
+    <p>select four pictures for the final strip</p>
   </div>
 
-  <button id="nextBtn" class="btn btn-primary sp-next" disabled>next →</button>
+  <button class="pill-btn fixed-next" id="nextBtn">next →</button>
+
+  <div class="picker-area">
+    <div class="selected-column" id="selectedColumn">
+      <div class="slot" data-slot="0"><span class="slot-num">1</span></div>
+      <div class="slot" data-slot="1"><span class="slot-num">2</span></div>
+      <div class="slot" data-slot="2"><span class="slot-num">3</span></div>
+      <div class="slot" data-slot="3"><span class="slot-num">4</span></div>
+    </div>
+
+    <div class="photo-grid" id="photoGrid"></div>
+  </div>
 
 <script src="js/state.js"></script>
-<script src="js/transition.js"></script>
 <script src="js/select-pictures.js"></script>
 </body>
 </html>

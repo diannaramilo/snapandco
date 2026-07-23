@@ -1,23 +1,18 @@
 /* ===== snap & co. — shared base styles =====
-   Every page (index, choose-set, camera, select-pictures,
-   choose-layout, result) loads this file first, then its
-   own page-specific stylesheet. */
+   Palette and component styles lifted from the original build
+   (landing.css / choose_set.css / choose_layout.css) so every page
+   stays visually consistent: warm cream background, deep brown
+   (#442f2a) text/borders, bubblegum pink (#ff69b4 / #F5CBD7) accent. */
 
 :root {
-  --cream: #fdf1de;
-  --cream-stripe: #f7e6c8;
-  --pink: #f3b8c8;
-  --pink-light: #fbe1e8;
-  --pink-dark: #e88fa6;
-  --brown: #3b2a24;
+  --cream: #fff7ec;
+  --brown: #442f2a;
+  --pink: #f5cbd7;
+  --pink-strong: #fa9db8;
+  --pink-accent: #ff69b4;
   --white: #ffffff;
-  --gray-block: #d9d9d9;
-  --radius-lg: 24px;
-  --radius-md: 14px;
-  --radius-sm: 8px;
-  --shadow-card: 0 6px 0 rgba(59, 42, 36, 0.08);
-  --font-heading: "Poppins", "Segoe UI", sans-serif;
-  --font-body: "Quicksand", "Segoe UI", sans-serif;
+  --gray-block: #e2e2e2;
+  --font: "Poppins", "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -25,91 +20,62 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: var(--font-body);
+  font-family: var(--font);
   color: var(--brown);
-  background: repeating-linear-gradient(
-    90deg,
-    var(--cream) 0px,
-    var(--cream) 18px,
-    var(--cream-stripe) 18px,
-    var(--cream-stripe) 20px
-  );
 }
 
-h1, h2, h3 {
-  font-family: var(--font-heading);
-  margin: 0;
-}
+h1, h2, h3 { margin: 0; font-weight: 600; }
 
-button {
-  font-family: var(--font-body);
-  cursor: pointer;
-  border: none;
-}
+button { font-family: var(--font); cursor: pointer; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.btn {
-  border-radius: 999px;
-  padding: 12px 28px;
-  font-weight: 700;
-  font-size: 15px;
-  background: var(--pink-light);
-  color: var(--brown);
-  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
-}
-
-.btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 0 rgba(59, 42, 36, 0.15);
-}
-
-.btn:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-.btn-primary {
-  background: var(--pink);
-}
-
-.btn-outline {
+/* pill-shaped outline button used for back/next/actions everywhere */
+.pill-btn {
+  height: 46px;
+  padding: 0 22px;
+  border: 1px solid var(--brown);
   background: transparent;
-  border: 2px solid var(--brown);
-  padding: 10px 22px;
+  color: var(--brown);
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  border-radius: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
+.pill-btn:hover { background: var(--brown); color: var(--white); }
+.pill-btn.loading { opacity: 0.6; pointer-events: none; }
 
-.top-back {
-  position: absolute;
-  top: 24px;
-  left: 24px;
+.pill-btn.fixed-back { position: fixed; left: 24px; top: 30px; z-index: 20; }
+.pill-btn.fixed-next {
+  position: fixed; right: 24px; bottom: 30px; z-index: 20;
+  opacity: 0; visibility: hidden; pointer-events: none;
 }
+.pill-btn.fixed-next.visible { opacity: 1; visibility: visible; pointer-events: auto; }
 
-/* generic page fade/slide transition, toggled by js/transition.js */
-.page-fade {
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.35s ease, transform 0.35s ease;
-}
+.page-header { text-align: center; padding-top: 46px; margin-bottom: 44px; }
+.page-header h1 { font-weight: 700; font-size: 42px; color: #1a1a1a; margin-bottom: 6px; }
+.page-header p { font-weight: 600; font-size: 15px; color: var(--brown); opacity: 0.75; }
 
-.page-fade.in {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.page-fade-out {
-  opacity: 0 !important;
-  transform: translateY(-12px) !important;
+.picker-area {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 70px;
+  flex-wrap: wrap;
+  padding: 0 40px 120px;
 }
 
 .watermark {
-  position: absolute;
-  bottom: 18px;
+  position: fixed;
+  bottom: 14px;
   left: 24px;
   font-size: 12px;
-  opacity: 0.55;
+  opacity: 0.5;
 }
