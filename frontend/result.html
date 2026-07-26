@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/modal.css" />
 <link rel="stylesheet" href="css/result.css" />
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="js/vendor/qrcode.js"></script>
 </head>
 <body>
   <div class="preview-container">
@@ -18,8 +18,8 @@
       <canvas id="finalCanvas"></canvas>
     </div>
 
-    <div class="qr-container left"><canvas id="qrLeft"></canvas></div>
-    <div class="qr-container right"><canvas id="qrRight"></canvas></div>
+    <div class="qr-container left"><div id="qrLeft"></div></div>
+    <div class="qr-container right"><div id="qrRight"></div></div>
 
     <div class="bottom-actions">
       <button id="downloadBtn" class="action-btn">

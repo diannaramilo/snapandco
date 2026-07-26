@@ -42,7 +42,7 @@ async function uploadToBackend(dataUrl) {
     const res = await fetch(`${BACKEND_URL}/api/save`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: dataUrl, set: session.set }),
+      body: JSON.stringify({ image: dataUrl, photos: session.finalPhotos, set: session.set }),
     });
     if (!res.ok) throw new Error("upload failed");
     const data = await res.json();
@@ -56,9 +56,15 @@ async function uploadToBackend(dataUrl) {
   }
 }
 
-async function renderQr(canvasEl, text) {
+function renderQr(containerEl, text) {
   if (!text || !window.QRCode) return;
-  await QRCode.toCanvas(canvasEl, text, { width: 320, margin: 1 });
+  containerEl.innerHTML = ""; // qrcodejs appends into the container; clear any previous render
+  new QRCode(containerEl, {
+    text,
+    width: 220,
+    height: 220,
+    correctLevel: QRCode.CorrectLevel.M,
+  });
 }
 
 async function init() {

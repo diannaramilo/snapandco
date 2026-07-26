@@ -70,8 +70,49 @@ def _decode_data_url(data_url: str) -> Image.Image:
     return Image.open(io.BytesIO(raw))
 
 
+import socket
+
+_cached_lan_ip = None
+
+
+def _detect_lan_ip() -> str:
+    """
+    Finds the machine's real LAN IP (e.g. 192.168.1.9) regardless of
+    what address the laptop's own browser happens to be using.
+
+    This matters because request.host_url reflects whatever address
+    the REQUEST came in on — if you open the site on the laptop via
+    http://localhost:5000, every QR code would encode "localhost",
+    which means nothing to a guest's phone ("Safari can't open the
+    page" is exactly that failure). Detecting the LAN IP directly
+    sidesteps that regardless of how the laptop itself is browsing.
+
+    The trick: opening a UDP "connection" to a public IP doesn't
+    actually send any packets, it just asks the OS to pick which
+    local network interface *would* be used for that route — which
+    is reliably the real LAN interface, even offline, as long as the
+    router/gateway is up (true for basically any event wifi).
+    """
+    global _cached_lan_ip
+    if _cached_lan_ip:
+        return _cached_lan_ip
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        _cached_lan_ip = s.getsockname()[0]
+    except OSError:
+        _cached_lan_ip = "127.0.0.1"  # last resort — only reachable from this same machine
+    finally:
+        s.close()
+    return _cached_lan_ip
+
+
 def _public_url(path: str) -> str:
-    base = SERVER_PUBLIC_URL or request.host_url.rstrip("/")
+    if SERVER_PUBLIC_URL:
+        base = SERVER_PUBLIC_URL.rstrip("/")
+    else:
+        port = request.host.split(":")[1] if ":" in request.host else "5000"
+        base = f"http://{_detect_lan_ip()}:{port}"
     return f"{base}{path}"
 
 
@@ -100,17 +141,56 @@ def serve_frontend_file(filename):
 # save + QR download
 # ---------------------------------------------------------------- #
 
+import time
+
+CLEANUP_AGE_SECONDS = 24 * 60 * 60  # 24 hours
+
+
+def _cleanup_old_files():
+    """Deletes saved photos/sheets older than 24 hours. Called on
+    every /api/save so there's no cron job or background thread to
+    set up — it just quietly sweeps as people use the booth. Matches
+    the "photos deleted automatically in 24 hours" note on the
+    download page."""
+    cutoff = time.time() - CLEANUP_AGE_SECONDS
+    for folder in (UPLOADS_DIR, PRINTS_DIR):
+        for name in os.listdir(folder):
+            path = os.path.join(folder, name)
+            try:
+                if os.path.isfile(path) and os.path.getmtime(path) < cutoff:
+                    os.remove(path)
+            except OSError:
+                pass  # file removed by another request already — fine
+
+
 @app.route("/api/save", methods=["POST"])
 def save_photo():
+    _cleanup_old_files()
+
     body = request.get_json(force=True)
     image = body.get("image")
+    photos = body.get("photos") or []  # the 4 individual (unframed) shots
     if not image:
         return jsonify({"error": "missing image"}), 400
 
     photo_id = uuid.uuid4().hex[:10]
-    img = _decode_data_url(image).convert("RGB")
-    path = os.path.join(UPLOADS_DIR, f"{photo_id}.png")
-    img.save(path, "PNG")
+
+    # JPEG, not PNG: these are guest-facing copies that just need to
+    # look good on a phone screen and load fast over event wifi — a
+    # lossless PNG re-encode of actual photo content runs several
+    # times larger for no visible benefit here. This has zero effect
+    # on print quality: /api/print always receives a fresh image
+    # straight from the browser's own canvas at print time, never
+    # these saved files.
+    strip_img = _decode_data_url(image).convert("RGB")
+    strip_img.save(os.path.join(UPLOADS_DIR, f"{photo_id}.jpg"), "JPEG", quality=90)
+
+    for i, photo_data_url in enumerate(photos[:4], start=1):
+        try:
+            img = _decode_data_url(photo_data_url).convert("RGB")
+            img.save(os.path.join(UPLOADS_DIR, f"{photo_id}_{i}.jpg"), "JPEG", quality=90)
+        except Exception:  # noqa: BLE001 — an individual shot failing to save shouldn't break the whole request
+            pass
 
     return jsonify({
         "id": photo_id,
@@ -124,56 +204,170 @@ DOWNLOAD_PAGE = """
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>snap & co. — your photo</title>
+  <title>snap & co. — your photos</title>
   <style>
     * { box-sizing: border-box; }
     body {
       font-family: "Poppins", sans-serif;
       text-align: center;
-      padding: 40px 20px;
+      padding: 36px 20px 28px;
       background: #fff7ec;
       color: #442f2a;
       margin: 0;
       min-height: 100vh;
     }
-    h2 { font-size: 22px; margin-bottom: 4px; }
-    p.tagline { opacity: 0.7; font-size: 13px; margin-top: 0; margin-bottom: 24px; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f5cbd7;
+      color: #d6316b;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.03em;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+    .badge .logo { font-weight: 800; color: #442f2a; }
+    h2 { font-size: 22px; margin: 0 0 8px; }
+    p.tagline { opacity: 0.75; font-size: 13px; margin: 0 auto 24px; max-width: 300px; line-height: 1.5; }
     .celebrate-gif {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 12px;
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 8px;
       display: block;
       /* drop your own celebratory GIF at backend/static/celebrate.gif
          (confetti, sparkles, etc.) and it'll show up here automatically */
     }
-    img.strip {
-      max-width: 260px;
-      width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 10px 26px rgba(68, 47, 42, 0.25);
+    .layout {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 18px;
+      max-width: 340px;
+      margin: 0 auto;
     }
-    a.button {
-      display: inline-block;
-      margin-top: 22px;
-      padding: 14px 30px;
+    .singles {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    .singles img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #eee;
+    }
+    .strip-col img.strip {
+      width: 130px;
+      border-radius: 6px;
+      box-shadow: 0 10px 26px rgba(68, 47, 42, 0.2);
+    }
+    .save-all-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 340px;
+      margin: 26px auto 10px;
+      padding: 15px;
       background: #ff69b4;
+      border: none;
       border-radius: 999px;
-      text-decoration: none;
       color: white;
-      font-weight: 600;
+      font-family: "Poppins", sans-serif;
+      font-weight: 700;
       font-size: 15px;
+      cursor: pointer;
       transition: transform 0.15s ease;
     }
-    a.button:active { transform: scale(0.97); }
+    .save-all-btn:active { transform: scale(0.97); }
+    .delete-note { font-size: 11px; color: #8a6f68; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .fallback-hint { font-size: 12px; color: #8a6f68; margin-top: 14px; max-width: 280px; margin-left: auto; margin-right: auto; line-height: 1.5; }
   </style>
 </head>
 <body>
   {% if has_gif %}<img class="celebrate-gif" src="/static/celebrate.gif" alt="">{% endif %}
-  <h2>snap &amp; co.</h2>
-  <p class="tagline">your strip is ready ✨</p>
-  <img class="strip" src="/uploads/{{ photo_id }}.png" alt="your strip">
-  <br>
-  <a class="button" href="/uploads/{{ photo_id }}.png" download="snap-and-co.png">⬇ save to your phone</a>
+  <div class="badge"><span class="logo">sn ap</span> SNAP &amp; CO</div>
+  <h2>✨ Your Photos Are Ready! ✨</h2>
+  <p class="tagline">Scan successful! Download your high-res prints and sharing strips below.</p>
+
+  <div class="layout">
+    <div class="singles">
+      {% for n in photo_numbers %}
+      <img src="/uploads/{{ photo_id }}_{{ n }}.jpg" alt="Photo {{ n }}">
+      {% endfor %}
+    </div>
+    <div class="strip-col">
+      <img class="strip" src="/uploads/{{ photo_id }}.jpg" alt="your strip">
+    </div>
+  </div>
+
+  <button class="save-all-btn" id="saveAllBtn">⬇ Save All Photos</button>
+  <div class="delete-note">🔒 Photos deleted automatically in 24 hours</div>
+  <div class="fallback-hint" id="fallbackHint" style="display:none;">
+    Tip: press and hold any photo above, then choose "Save Image" — works on any phone.
+  </div>
+
+  <script>
+    /*
+     * iOS Safari intentionally does NOT support the HTML `download`
+     * attribute for images — clicking a download link there just
+     * NAVIGATES to that image's URL instead. Doing that in a loop
+     * for 5 images just means the last one (the strip) is the only
+     * one anyone ever sees, because each navigation replaces the
+     * last before the previous "download" ever had a chance.
+     *
+     * The fix: use the native Share Sheet (Web Share API with
+     * files), which is the same "Save Image"/"Save to Photos" flow
+     * people already know from every other app — and it actually
+     * saves every file, not just the last one. Falls back to the
+     * old sequential-download approach for browsers that don't
+     * support sharing files (mostly desktop), where the download
+     * attribute works fine anyway.
+     */
+    document.getElementById('saveAllBtn').addEventListener('click', async () => {
+      const urls = [...document.querySelectorAll('img')]
+        .map(img => img.getAttribute('src'))
+        .filter(src => src && src.startsWith('/uploads/'));
+
+      if (navigator.canShare) {
+        try {
+          const files = await Promise.all(urls.map(async (src) => {
+            const res = await fetch(src);
+            const blob = await res.blob();
+            return new File([blob], src.split('/').pop(), { type: blob.type || 'image/jpeg' });
+          }));
+          if (navigator.canShare({ files })) {
+            await navigator.share({ files, title: 'snap & co.' });
+            return;
+          }
+        } catch (err) {
+          // user cancelled the share sheet, or sharing failed for
+          // some other reason — fall through to direct downloads
+          if (err && err.name === 'AbortError') return; // they cancelled on purpose, don't also spam downloads
+        }
+      }
+
+      // fallback: browsers that support the download attribute
+      // properly (desktop Chrome/Firefox/Edge, Android Chrome)
+      urls.forEach((src, i) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = src;
+          a.download = src.split('/').pop();
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }, i * 350);
+      });
+      document.getElementById('fallbackHint').style.display = 'block';
+    });
+  </script>
 </body>
 </html>
 """
@@ -181,11 +375,18 @@ DOWNLOAD_PAGE = """
 
 @app.route("/photo/<photo_id>")
 def photo_page(photo_id):
-    path = os.path.join(UPLOADS_DIR, f"{photo_id}.png")
+    path = os.path.join(UPLOADS_DIR, f"{photo_id}.jpg")
     if not os.path.exists(path):
-        return "Photo not found (or not saved yet — try again in a moment).", 404
+        return "Photo not found (or not saved yet — try again in a moment, or it may have passed the 24-hour auto-delete window).", 404
+
     has_gif = os.path.exists(os.path.join(BASE_DIR, "static", "celebrate.gif"))
-    return render_template_string(DOWNLOAD_PAGE, photo_id=photo_id, has_gif=has_gif)
+    photo_numbers = [
+        n for n in range(1, 5)
+        if os.path.exists(os.path.join(UPLOADS_DIR, f"{photo_id}_{n}.jpg"))
+    ]
+    return render_template_string(
+        DOWNLOAD_PAGE, photo_id=photo_id, has_gif=has_gif, photo_numbers=photo_numbers
+    )
 
 
 @app.route("/uploads/<filename>")
@@ -297,9 +498,22 @@ def print_photo():
 
 
 if __name__ == "__main__":
-    # debug=True is handy while you're setting this up (auto-reloads
-    # on file changes, shows tracebacks in the browser) but turn it
-    # off for the actual event — set the env var below, or just
-    # change this line to debug=False.
-    debug_mode = os.environ.get("SNAPANDCO_DEBUG", "1") == "1"
-    app.run(host="0.0.0.0", port=5000, debug=debug_mode)
+    # IMPORTANT: use_reloader is always off. Flask's debug reloader
+    # watches every file under this folder for changes and restarts
+    # the whole server when one changes — but /api/save and
+    # /api/print write new photo files into static/uploads and
+    # static/prints on every single use. The reloader saw those as
+    # "code changed," restarted mid-request, and killed whatever
+    # request was in flight — which shows up on a guest's phone as
+    # "Safari couldn't open the page because the server stopped
+    # responding." debug=True still gives you in-browser tracebacks
+    # if something errors, it just won't auto-restart on file writes.
+    #
+    # threaded=True matters just as much: Flask's dev server handles
+    # ONE request at a time by default. Without this, if the booth
+    # laptop is mid-request (saving a photo, building a print sheet),
+    # a guest's phone trying to load the QR page at that exact moment
+    # just queues up behind it — and can time out entirely, which
+    # looks identical to a crashed server from the guest's side.
+    debug_mode = os.environ.get("SNAPANDCO_DEBUG", "0") == "1"
+    app.run(host="0.0.0.0", port=5000, debug=debug_mode, use_reloader=False, threaded=True)
