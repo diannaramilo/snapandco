@@ -32,9 +32,9 @@ body { margin: 0; padding: 0; background: white; font-family: "Poppins", sans-se
 }
 .qr-container.left { left: 60px; }
 .qr-container.right { right: 60px; }
-.qr-container canvas { width: 100%; height: 100%; }
+.qr-container canvas, .qr-container img { width: 100%; height: 100%; display: block; }
 
-.bottom-actions { position: absolute; left: 40px; bottom: 40px; display: flex; gap: 12px; z-index: 5; }
+.bottom-actions { position: absolute; left: 40px; bottom: 40px; display: flex; gap: 12px; z-index: 5; flex-wrap: wrap; max-width: 320px; }
 
 .action-btn {
   height: 46px;
