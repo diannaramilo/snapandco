@@ -2,22 +2,26 @@
  * result.js
  * ----------
  * 1. Redraws the chosen frame + photos at full print resolution
- *    onto #finalCanvas (styled to the same 208x623 box as the old
- *    preview page, but the actual bitmap is 600x1800 = 2x6" @300dpi).
- * 2. Uploads that image to the Flask backend, which hands back a
- *    short download URL — that's what the QR codes point to.
- * 3. Wires up download / print / restart / extra-copies.
+ *    onto #finalCanvas.
+ * 2. Uploads that image to the backend, which hands back a short
+ *    download URL — that's what the QR codes point to.
+ * 3. Wires up download / print / preview-layout / restart / extra-copies.
  *
- * BACKEND_URL: change this to wherever backend/app.py is actually
- * running (see README). If the backend isn't reachable, download
- * still works locally — only the QR / server-side print need it.
+ * BACKEND_URL defaults to "" (same origin) because app.py now serves
+ * the frontend itself — so this page IS already being served by the
+ * backend, and relative fetches like "/api/save" just work, on
+ * localhost or on your LAN IP, with nothing to configure. Only set
+ * window.SNAPANDCO_BACKEND_URL if the backend is running somewhere
+ * else (e.g. you're still using a separate static file server for
+ * the frontend during development).
  */
 
-const BACKEND_URL = window.SNAPANDCO_BACKEND_URL || "http://localhost:5000";
+const BACKEND_URL = window.SNAPANDCO_BACKEND_URL || "";
 
 const session = requireSessionField("frameId", "choose-set.html");
 const finalCanvas = document.getElementById("finalCanvas");
 const statusMsg = document.getElementById("statusMsg");
+const previewBtn = document.getElementById("previewBtn");
 
 let extraCopies = 0;
 
@@ -47,7 +51,7 @@ async function uploadToBackend(dataUrl) {
   } catch (err) {
     console.warn("Backend not reachable, QR/print will be limited:", err);
     statusMsg.textContent =
-      "Backend server not reachable — download still works, but QR saving and auto-print need backend/app.py running.";
+      "Backend not reachable — download still works, but QR saving and print need the backend running (see console for details).";
     return null;
   }
 }
@@ -62,7 +66,7 @@ async function init() {
   saveSession({ resultImage: dataUrl });
 
   const uploadedUrl = await uploadToBackend(dataUrl);
-  const qrTarget = uploadedUrl || `${BACKEND_URL}/photo/pending`;
+  const qrTarget = uploadedUrl || `${window.location.origin}/photo/pending`;
 
   renderQr(document.getElementById("qrLeft"), qrTarget);
   renderQr(document.getElementById("qrRight"), qrTarget);
@@ -75,8 +79,14 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
   link.click();
 });
 
-document.getElementById("printBtn").addEventListener("click", async () => {
-  statusMsg.textContent = "Sending to printer…";
+/* Sends the sheet to the printer AND (either way) hands back a URL
+   to the exact PNG that was built, so you can always open it and
+   visually confirm the layout — there's no print dialog to eyeball
+   it in otherwise. The copies count that comes back in the response
+   also confirms the +/- stepper is actually being read correctly. */
+async function requestPrint({ previewOnly }) {
+  const copies = 1 + extraCopies;
+  statusMsg.textContent = previewOnly ? "Building preview…" : "Sending to printer…";
   try {
     const res = await fetch(`${BACKEND_URL}/api/print`, {
       method: "POST",
@@ -85,17 +95,31 @@ document.getElementById("printBtn").addEventListener("click", async () => {
         id: getSession().sessionId,
         image: getSession().resultImage,
         set: session.set,
-        copies: 1 + extraCopies,
+        copies,
+        preview_only: previewOnly,
       }),
     });
-    if (!res.ok) throw new Error("print failed");
-    statusMsg.textContent = "Sent to printer ✓";
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "print failed");
+
+    if (data.sheet_url) window.open(data.sheet_url, "_blank");
+
+    statusMsg.textContent = previewOnly
+      ? `Preview opened in a new tab (set ${session.set} layout, ${copies} ${copies === 1 ? "copy" : "copies"} would be sent) ✓`
+      : `Sent ${copies} ${copies === 1 ? "copy" : "copies"} to the printer ✓ — preview opened in a new tab so you can double check it.`;
   } catch (err) {
     console.error(err);
-    statusMsg.textContent = "Couldn't reach the print server. Falling back to your browser's print dialog.";
-    window.print();
+    if (previewOnly) {
+      statusMsg.textContent = "Couldn't reach the backend to build a preview.";
+    } else {
+      statusMsg.textContent = "Couldn't reach the print server. Falling back to your browser's print dialog.";
+      window.print();
+    }
   }
-});
+}
+
+document.getElementById("printBtn").addEventListener("click", () => requestPrint({ previewOnly: false }));
+previewBtn.addEventListener("click", () => requestPrint({ previewOnly: true }));
 
 document.getElementById("restartBtn").addEventListener("click", async () => {
   const confirmed = await confirmModal({
